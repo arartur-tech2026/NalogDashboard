@@ -1,0 +1,650 @@
+<!DOCTYPE html>
+<html lang="ru" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>Налоги в Российской Федерации</title>
+    <style>
+        :root {
+            --bg-color: #f8fafc;
+            --surface-color: #ffffff;
+            --surface-secondary: #f1f5f9;
+            --text-primary: #0f172a;
+            --text-secondary: #475569;
+            --accent-color: #2563eb;
+            --accent-hover: #1d4ed8;
+            --border-color: #e2e8f0;
+            --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            --card-hover-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            --transition: all 0.3s ease;
+            
+            /* Цвета фильтров */
+            --color-citizens: #10b981;
+            --color-business: #3b82f6;
+            --color-indirect: #f59e0b;
+            --color-resources: #8b5cf6;
+        }
+
+        [data-theme="dark"] {
+            --bg-color: #0f172a;
+            --surface-color: #1e293b;
+            --surface-secondary: #0f172a;
+            --text-primary: #f8fafc;
+            --text-secondary: #cbd5e1;
+            --accent-color: #3b82f6;
+            --accent-hover: #60a5fa;
+            --border-color: #334155;
+            --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.5);
+            --card-hover-shadow: 0 10px 20px -5px rgba(0, 0, 0, 0.5);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-primary);
+            line-height: 1.5;
+            transition: var(--transition);
+            min-height: 100vh;
+        }
+
+        /* --- СТАРТОВЫЙ ЭКРАН --- */
+        .splash-screen {
+            position: fixed;
+            inset: 0;
+            background: linear-gradient(135deg, var(--bg-color) 0%, var(--border-color) 100%);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+            transition: opacity 0.5s ease, visibility 0.5s ease;
+            padding: 1.5rem;
+        }
+
+        .splash-screen.hidden {
+            opacity: 0;
+            visibility: hidden;
+        }
+
+        .splash-title {
+            font-size: clamp(1.5rem, 8vw, 3rem);
+            font-weight: 800;
+            color: var(--text-primary);
+            text-align: center;
+            margin-bottom: 2rem;
+            letter-spacing: -0.02em;
+            line-height: 1.2;
+            max-width: 100%;
+            word-break: break-word;
+            overflow-wrap: break-word;
+            hyphens: auto;
+        }
+
+        .start-btn {
+            background-color: var(--accent-color);
+            color: #ffffff;
+            border: none;
+            padding: 1rem 2.5rem;
+            border-radius: 9999px;
+            font-size: clamp(1.1rem, 4vw, 1.25rem);
+            font-weight: 700;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(37, 99, 235, 0.4);
+            animation: pulse 2s infinite;
+            transition: transform 0.2s ease, background-color 0.2s ease;
+        }
+
+        .start-btn:hover {
+            background-color: var(--accent-hover);
+        }
+        
+        .start-btn:active {
+            transform: scale(0.95);
+        }
+
+        @keyframes pulse {
+            0% { box-shadow: 0 0 0 0 rgba(37, 99, 235, 0.6); }
+            70% { box-shadow: 0 0 0 15px rgba(37, 99, 235, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(37, 99, 235, 0); }
+        }
+
+        /* --- ОСНОВНОЙ ИНТЕРФЕЙС --- */
+        .app-container {
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.5s ease, visibility 0.5s ease;
+            height: 0;
+            overflow: hidden;
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 1rem;
+        }
+
+        .app-container.visible {
+            opacity: 1;
+            visibility: visible;
+            height: auto;
+            overflow: visible;
+        }
+
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid var(--border-color);
+            margin-bottom: 1.5rem;
+        }
+
+        h1 {
+            font-size: clamp(1.2rem, 4vw, 1.5rem);
+            font-weight: 800;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            letter-spacing: -0.025em;
+        }
+
+        h1 svg {
+            width: 28px;
+            height: 28px;
+            fill: var(--accent-color);
+            flex-shrink: 0;
+        }
+
+        .theme-toggle {
+            background: var(--surface-color);
+            border: 1px solid var(--border-color);
+            cursor: pointer;
+            padding: 0.5rem;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: var(--transition);
+            color: var(--text-primary);
+            flex-shrink: 0;
+        }
+
+        .theme-toggle:hover {
+            transform: scale(1.1);
+            border-color: var(--accent-color);
+            color: var(--accent-color);
+        }
+
+        .theme-toggle svg {
+            width: 20px;
+            height: 20px;
+            fill: currentColor;
+        }
+
+        /* Фильтры */
+        .filters-wrapper {
+            background-color: var(--surface-color);
+            padding: 1rem;
+            border-radius: 16px;
+            border: 1px solid var(--border-color);
+            margin-bottom: 1.5rem;
+            box-shadow: var(--shadow);
+        }
+
+        .filters-title {
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--text-secondary);
+            margin-bottom: 0.75rem;
+            font-weight: 700;
+        }
+
+        .filters {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }
+
+        .filter-btn {
+            background-color: transparent;
+            color: var(--text-secondary);
+            border: 1px solid var(--border-color);
+            padding: 0.5rem 1rem;
+            border-radius: 99px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+        }
+
+        .filter-btn svg {
+            width: 16px;
+            height: 16px;
+            fill: currentColor;
+        }
+
+        .filter-btn:hover {
+            color: var(--text-primary);
+            background-color: var(--surface-secondary);
+        }
+
+        .filter-btn.active[data-filter="all"] { background-color: var(--text-primary); color: var(--bg-color); border-color: var(--text-primary); }
+        .filter-btn.active[data-filter="citizens"] { background-color: var(--color-citizens); color: white; border-color: var(--color-citizens); }
+        .filter-btn.active[data-filter="business"] { background-color: var(--color-business); color: white; border-color: var(--color-business); }
+        .filter-btn.active[data-filter="indirect"] { background-color: var(--color-indirect); color: white; border-color: var(--color-indirect); }
+        .filter-btn.active[data-filter="resources"] { background-color: var(--color-resources); color: white; border-color: var(--color-resources); }
+
+        /* Вкладки (Органы/Уровни) */
+        .tabs-container {
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+            margin-bottom: 1.5rem;
+            scrollbar-width: none; /* Firefox */
+        }
+        .tabs-container::-webkit-scrollbar { display: none; /* Safari/Chrome */ }
+
+        .tabs {
+            display: flex;
+            gap: 0.5rem;
+            min-width: max-content;
+        }
+
+        .tab-btn {
+            background-color: var(--surface-color);
+            color: var(--text-primary);
+            border: 1px solid var(--border-color);
+            padding: 0.75rem 1.25rem;
+            border-radius: 12px;
+            font-size: 0.95rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .tab-btn svg {
+            width: 18px;
+            height: 18px;
+            fill: currentColor;
+        }
+
+        .tab-btn:hover {
+            border-color: var(--accent-color);
+        }
+
+        .tab-btn.active {
+            background-color: var(--accent-color);
+            color: white;
+            border-color: var(--accent-color);
+            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.2);
+        }
+
+        /* Матрица/Сетка */
+        .main-grid {
+            display: grid;
+            gap: 1.5rem;
+            grid-template-columns: 1fr;
+            align-items: start;
+        }
+
+        @media (min-width: 768px) {
+            .main-grid.show-all { grid-template-columns: repeat(3, 1fr); }
+            .app-container { padding: 2rem; }
+        }
+
+        .body-column {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            animation: fadeIn 0.4s ease-out;
+        }
+
+        .column-header {
+            font-size: 1.1rem;
+            font-weight: 700;
+            padding: 0.75rem 1rem;
+            background-color: var(--surface-color);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            text-align: center;
+            color: var(--accent-color);
+            box-shadow: var(--shadow);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 0.5rem;
+            position: sticky;
+            top: 10px;
+            z-index: 10;
+        }
+
+        /* Карточки */
+        .card {
+            background-color: var(--surface-color);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 1.25rem;
+            box-shadow: var(--shadow);
+            transition: var(--transition);
+            border-left: 4px solid var(--border-color);
+        }
+
+        .card:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--card-hover-shadow);
+        }
+
+        .card[data-filter*="citizens"] { border-left-color: var(--color-citizens); }
+        .card[data-filter*="business"] { border-left-color: var(--color-business); }
+        .card[data-filter*="indirect"] { border-left-color: var(--color-indirect); }
+        .card[data-filter*="resources"] { border-left-color: var(--color-resources); }
+
+        .card-title {
+            font-weight: 700;
+            font-size: 1.05rem;
+            margin-bottom: 0.5rem;
+            color: var(--text-primary);
+            display: flex;
+            align-items: flex-start;
+            gap: 0.5rem;
+        }
+
+        .card-title svg {
+            width: 18px;
+            height: 18px;
+            fill: var(--text-secondary);
+            flex-shrink: 0;
+            margin-top: 0.2rem;
+        }
+
+        .card-desc {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            margin-bottom: 0.75rem;
+            line-height: 1.5;
+        }
+
+        .card-example {
+            font-size: 0.85rem;
+            background-color: var(--surface-secondary);
+            padding: 0.75rem;
+            border-radius: 8px;
+            color: var(--text-primary);
+            font-style: italic;
+            border-left: 2px solid var(--accent-color);
+        }
+
+        .hidden { display: none !important; }
+
+        .empty-state {
+            text-align: center;
+            padding: 2.5rem 1rem;
+            background-color: var(--surface-color);
+            border: 1px dashed var(--border-color);
+            border-radius: 12px;
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+            font-weight: 500;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+    </style>
+</head>
+<body>
+
+    <svg style="display: none;">
+        <defs>
+            <symbol id="icon-sun" viewBox="0 0 24 24"><path d="M12 2.25a.75.75 0 01.75.75v2.25a.75.75 0 01-1.5 0V3a.75.75 0 01.75-.75zM7.5 12a4.5 4.5 0 119 0 4.5 4.5 0 01-9 0zM18.894 6.166a.75.75 0 00-1.06-1.06l-1.591 1.59a.75.75 0 101.06 1.061l1.591-1.59zM21.75 12a.75.75 0 01-.75.75h-2.25a.75.75 0 010-1.5H21a.75.75 0 01.75.75zM17.834 18.894a.75.75 0 001.06-1.06l-1.59-1.591a.75.75 0 10-1.061 1.06l1.59 1.591zM12 18.75a.75.75 0 01.75.75V21a.75.75 0 01-1.5 0v-1.5a.75.75 0 01.75-.75zM6.166 17.834a.75.75 0 00-1.06 1.06l1.59 1.591a.75.75 0 101.06-1.061l-1.59-1.59zM4.5 12a.75.75 0 01-.75.75H1.5a.75.75 0 010-1.5h2.25a.75.75 0 01.75.75zM6.166 6.166a.75.75 0 001.06-1.06l-1.59-1.59a.75.75 0 00-1.061 1.06l1.59 1.59z" /></symbol>
+            <symbol id="icon-moon" viewBox="0 0 24 24"><path fill-rule="evenodd" d="M9.528 1.718a.75.75 0 01.162.819A8.97 8.97 0 009 6a9 9 0 009 9 8.97 8.97 0 003.463-.69.75.75 0 01.981.98 10.503 10.503 0 01-9.694 6.46c-5.799 0-10.5-4.701-10.5-10.5 0-4.368 2.667-8.112 6.46-9.694a.75.75 0 01.818.162z" clip-rule="evenodd" /></symbol>
+            <symbol id="icon-tax" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/></symbol>
+            
+            <symbol id="icon-all" viewBox="0 0 24 24"><path d="M4 4h6v6H4zm10 0h6v6h-6zM4 14h6v6H4zm10 0h6v6h-6z"/></symbol>
+            <symbol id="icon-citizens" viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></symbol>
+            <symbol id="icon-business" viewBox="0 0 24 24"><path d="M12 7V3H2v18h20V7H12zM6 19H4v-2h2v2zm0-4H4v-2h2v2zm0-4H4V9h2v2zm0-4H4V5h2v2zm4 12H8v-2h2v2zm0-4H8v-2h2v2zm0-4H8V9h2v2zm0-4H8V5h2v2zm10 12h-8v-2h2v-2h-2v-2h2v-2h-2V9h8v10zm-2-8h-2v2h2v-2zm0 4h-2v2h2v-2z"/></symbol>
+            <symbol id="icon-indirect" viewBox="0 0 24 24"><path d="M16 1h-4v3H8c-2.21 0-4 1.79-4 4v12c0 2.21 1.79 4 4 4h8c2.21 0 4-1.79 4-4V8c0-2.21-1.79-4-4-4h-4V1zm-2 18H8v-2h6v2zm2-4H8v-2h8v2zm0-4H8V9h8v2z"/></symbol>
+            <symbol id="icon-resources" viewBox="0 0 24 24"><path d="M14 6l-4.22 5.63 1.22 1.63L14 9.33l4 5.34H6l3-4 1.5 2 1.5-2L14 6zM21 3H3c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h18c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2z"/></symbol>
+            
+            <symbol id="icon-fed" viewBox="0 0 24 24"><path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm-2 16l-4-4 1.41-1.41L10 14.17l6.59-6.59L18 9l-8 8z"/></symbol>
+            <symbol id="icon-reg" viewBox="0 0 24 24"><path d="M15 11V5l-3-3-3 3v2H3v14h18V11h-6zm-8 8H5v-2h2v2zm0-4H5v-2h2v2zm0-4H5V9h2v2zm6 8h-2v-2h2v2zm0-4h-2v-2h2v2zm0-4h-2V9h2v2zm0-4h-2V5h2v2zm6 12h-2v-2h2v2zm0-4h-2v-2h2v2z"/></symbol>
+            <symbol id="icon-loc" viewBox="0 0 24 24"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></symbol>
+            <symbol id="icon-item" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 14H9V8h2v8zm4 0h-2V8h2v8z"/></symbol>
+        </defs>
+    </svg>
+
+    <div id="splash-screen" class="splash-screen">
+        <h1 class="splash-title">НАЛОГИ В РФ</h1>
+        <button id="start-btn" class="start-btn">Начать изучение</button>
+    </div>
+
+    <div class="app-container" id="main-app">
+        <header>
+            <h1>
+                <svg><use href="#icon-tax"></use></svg>
+                Система налогов РФ
+            </h1>
+            <button class="theme-toggle" id="theme-btn" aria-label="Переключить тему">
+                <svg id="theme-icon"><use href="#icon-moon"></use></svg>
+            </button>
+        </header>
+
+        <div class="filters-wrapper">
+            <div class="filters-title">Смысловые категории</div>
+            <div class="filters">
+                <button class="filter-btn active" data-filter="all">
+                    <svg><use href="#icon-all"></use></svg> Все налоги
+                </button>
+                <button class="filter-btn" data-filter="citizens">
+                    <svg><use href="#icon-citizens"></use></svg> Для граждан
+                </button>
+                <button class="filter-btn" data-filter="business">
+                    <svg><use href="#icon-business"></use></svg> Для бизнеса
+                </button>
+                <button class="filter-btn" data-filter="indirect">
+                    <svg><use href="#icon-indirect"></use></svg> Косвенные
+                </button>
+                <button class="filter-btn" data-filter="resources">
+                    <svg><use href="#icon-resources"></use></svg> Ресурсы и специфика
+                </button>
+            </div>
+        </div>
+
+        <nav class="tabs-container">
+            <div class="tabs">
+                <button class="tab-btn active" data-target="all">
+                    <svg><use href="#icon-all"></use></svg> Все уровни (Матрица)
+                </button>
+                <button class="tab-btn" data-target="fed">
+                    <svg><use href="#icon-fed"></use></svg> Федеральные
+                </button>
+                <button class="tab-btn" data-target="reg">
+                    <svg><use href="#icon-reg"></use></svg> Региональные
+                </button>
+                <button class="tab-btn" data-target="loc">
+                    <svg><use href="#icon-loc"></use></svg> Местные
+                </button>
+            </div>
+        </nav>
+
+        <main class="main-grid show-all" id="main-grid">
+            
+            <div class="body-column" id="col-fed">
+                <div class="column-header"><svg><use href="#icon-fed"></use></svg> Федеральные налоги</div>
+                <div class="empty-state hidden">В данной категории налоги не представлены</div>
+                
+                <div class="card" data-filter="indirect business"><div class="card-title"><svg><use href="#icon-item"></use></svg>Налог на добавленную стоимость (НДС)</div><div class="card-desc">Основной косвенный налог, стандартная ставка которого составляет 20%. НДС взимается с продажи товаров и услуг на всех этапах производства и распределения.</div><div class="card-example">Пример: при покупке телевизора в магазине на цену добавляется НДС, который составляет 20% от стоимости товара.</div></div>
+                
+                <div class="card" data-filter="indirect business"><div class="card-title"><svg><use href="#icon-item"></use></svg>Акцизы</div><div class="card-desc">Косвенные налоги на определенные товары, такие как алкоголь, табак и топливо.</div><div class="card-example">Пример: высокие акцизы на бензин влияют на конечную цену топлива для потребителей.</div></div>
+                
+                <div class="card" data-filter="citizens"><div class="card-title"><svg><use href="#icon-item"></use></svg>Налог на доходы физических лиц (НДФЛ)</div><div class="card-desc">Прямой налог на доходы граждан. Стандартная ставка составляет 13%, а для доходов свыше 2,4 млн рублей в год – 15% и так далее до 22% с дохода свыше 50 млн рублей. В 2025 году прогрессивная шкала состоит из 5 ступеней.</div><div class="card-example">Пример: человек, зарабатывающий 3 млн рублей в год, уплачивает 15% с дохода свыше 2,4 млн рублей.</div></div>
+                
+                <div class="card" data-filter="business"><div class="card-title"><svg><use href="#icon-item"></use></svg>Налог на прибыль организаций</div><div class="card-desc">Прямой налог на прибыль юридических лиц. Стандартная ставка 25%, из которых 8% идут в федеральный бюджет, а 17% – в бюджет субъекта РФ (ст. 284 НК РФ).</div><div class="card-example">Пример: компания, получившая прибыль в размере 1 млн рублей, уплачивает 250 тыс. рублей налога на прибыль.</div></div>
+                
+                <div class="card" data-filter="resources business"><div class="card-title"><svg><use href="#icon-item"></use></svg>Сборы за пользование объектами животного мира и ВБР</div><div class="card-desc">Платежи за использование природных ресурсов (водных биологических ресурсов и животного мира).</div><div class="card-example">Пример: фирма, занимающаяся рыболовством, платит сбор за использование водных ресурсов.</div></div>
+                
+                <div class="card" data-filter="resources business"><div class="card-title"><svg><use href="#icon-item"></use></svg>Водный налог</div><div class="card-desc">Плата за пользование водными объектами, направленная на охрану и рациональное использование водных ресурсов.</div><div class="card-example">Пример: предприятие, использующее водные ресурсы для производства, уплачивает водный налог.</div></div>
+                
+                <div class="card" data-filter="citizens business"><div class="card-title"><svg><use href="#icon-item"></use></svg>Государственная пошлина</div><div class="card-desc">Обязательный платеж за юридически значимые действия, такие как регистрация бизнеса или оформление документов.</div><div class="card-example">Пример: открытие ООО сопровождается уплатой государственной пошлины за регистрацию.</div></div>
+                
+                <div class="card" data-filter="resources business"><div class="card-title"><svg><use href="#icon-item"></use></svg>Налог на дополнительный доход (НДД)</div><div class="card-desc">Налог на дополнительный доход, полученный от добычи углеводородного сырья (нефти и газа).</div><div class="card-example">Пример: энергетическая компания, добывающая нефть, уплачивает налог на дополнительный доход от своей деятельности.</div></div>
+                
+                <div class="card" data-filter="resources business"><div class="card-title"><svg><use href="#icon-item"></use></svg>Налог на добычу полезных ископаемых (НДПИ)</div><div class="card-desc">Плата за добычу полезных ископаемых, направленная на вознаграждение государства за использование природных ресурсов.</div><div class="card-example">Пример: компания, добывающая уголь, обязана уплачивать НДПИ.</div></div>
+            </div>
+
+            <div class="body-column" id="col-reg">
+                <div class="column-header"><svg><use href="#icon-reg"></use></svg> Региональные налоги</div>
+                <div class="empty-state hidden">В данной категории налоги не представлены</div>
+
+                <div class="card" data-filter="business"><div class="card-title"><svg><use href="#icon-item"></use></svg>Налог на имущество организаций</div><div class="card-desc">Взимается с кадастровой стоимости имущества юридических лиц.</div><div class="card-example">Пример: компания, владеющая офисным зданием, платит налог на имущество по его кадастровой стоимости.</div></div>
+                
+                <div class="card" data-filter="business resources"><div class="card-title"><svg><use href="#icon-item"></use></svg>Налог на игорный бизнес</div><div class="card-desc">Применяется к организациям, занимающимся игорным бизнесом, с целью регулирования этой отрасли.</div><div class="card-example">Пример: казино обязано уплачивать налог на игорный бизнес в регионе, где оно находится.</div></div>
+                
+                <div class="card" data-filter="citizens business"><div class="card-title"><svg><use href="#icon-item"></use></svg>Транспортный налог</div><div class="card-desc">Налог на владение транспортными средствами, размер которого зависит от мощности двигателя и других характеристик ТС.</div><div class="card-example">Пример: владелец автомобиля с мощностью двигателя 150 лошадиных сил уплачивает транспортный налог по установленной ставке.</div></div>
+            </div>
+
+            <div class="body-column" id="col-loc">
+                <div class="column-header"><svg><use href="#icon-loc"></use></svg> Местные налоги</div>
+                <div class="empty-state hidden">В данной категории налоги не представлены</div>
+
+                <div class="card" data-filter="citizens business"><div class="card-title"><svg><use href="#icon-item"></use></svg>Земельный налог</div><div class="card-desc">Взимается с кадастровой стоимости земельных участков. Уплачивают как физические, так и юридические лица.</div></div>
+                
+                <div class="card" data-filter="citizens"><div class="card-title"><svg><use href="#icon-item"></use></svg>Налог на имущество физических лиц</div><div class="card-desc">Платится гражданами с кадастровой стоимости принадлежащей им недвижимости (квартиры, дома, гаражи).</div></div>
+                
+                <div class="card" data-filter="business indirect"><div class="card-title"><svg><use href="#icon-item"></use></svg>Торговый сбор</div><div class="card-desc">Применяется в некоторых регионах (например, в Москве) для лиц, занимающихся торговой деятельностью.</div></div>
+                
+                <div class="card" data-filter="business indirect resources"><div class="card-title"><svg><use href="#icon-item"></use></svg>Туристический налог</div><div class="card-desc">Новый налог, взимаемый с туристов и лиц, получающих доходы от туристической деятельности.</div><div class="card-example">Пример: гостиница взимает туристический налог с гостей за проживание и перечисляет его в местный бюджет.</div></div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const tabBtns = document.querySelectorAll('.tab-btn');
+            const filterBtns = document.querySelectorAll('.filter-btn');
+            const columns = document.querySelectorAll('.body-column');
+            const mainGrid = document.getElementById('main-grid');
+            
+            // Логика стартового экрана
+            const splashScreen = document.getElementById('splash-screen');
+            const startBtn = document.getElementById('start-btn');
+            const mainApp = document.getElementById('main-app');
+
+            startBtn.addEventListener('click', () => {
+                // Безопасный переход в полноэкранный режим
+                try {
+                    const docElm = document.documentElement;
+                    let fsPromise;
+                    if (docElm.requestFullscreen) {
+                        fsPromise = docElm.requestFullscreen();
+                    } else if (docElm.webkitRequestFullscreen) { /* Safari */
+                        fsPromise = docElm.webkitRequestFullscreen();
+                    } else if (docElm.mozRequestFullScreen) { /* Firefox */
+                        fsPromise = docElm.mozRequestFullScreen();
+                    }
+                    
+                    if (fsPromise && typeof fsPromise.catch === 'function') {
+                        fsPromise.catch(err => console.warn('Fullscreen API policy warning:', err));
+                    }
+                } catch (error) {
+                    console.warn('Fullscreen API is not supported or blocked:', error);
+                }
+
+                splashScreen.classList.add('hidden');
+                setTimeout(() => {
+                    splashScreen.style.display = 'none';
+                    mainApp.classList.add('visible');
+                    updateDisplay();
+                }, 500);
+            });
+
+            // Управление состояниями (Матричный движок)
+            let currentTab = 'all';
+            let currentFilter = 'all';
+
+            function updateDisplay() {
+                if (currentTab === 'all') {
+                    mainGrid.classList.add('show-all');
+                } else {
+                    mainGrid.classList.remove('show-all');
+                }
+
+                columns.forEach(col => {
+                    const isTabMatch = currentTab === 'all' || col.id === `col-${currentTab}`;
+                    col.style.display = isTabMatch ? 'flex' : 'none';
+
+                    if (isTabMatch) {
+                        let visibleCardsCount = 0;
+                        const cards = col.querySelectorAll('.card');
+                        const emptyState = col.querySelector('.empty-state');
+
+                        cards.forEach(card => {
+                            // Проверяем, содержит ли карточка нужный фильтр в data-filter
+                            const cardFilters = card.getAttribute('data-filter') || '';
+                            const isFilterMatch = currentFilter === 'all' || cardFilters.includes(currentFilter);
+                            
+                            if (isFilterMatch) {
+                                card.classList.remove('hidden');
+                                visibleCardsCount++;
+                            } else {
+                                card.classList.add('hidden');
+                            }
+                        });
+
+                        if (visibleCardsCount === 0) {
+                            emptyState.classList.remove('hidden');
+                        } else {
+                            emptyState.classList.add('hidden');
+                        }
+                    }
+                });
+            }
+
+            // Обработчики вкладок
+            tabBtns.forEach(btn => {
+                btn.addEventListener('click', () => {
+                    tabBtns.forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+                    currentTab = btn.getAttribute('data-target');
+                    updateDisplay();
+                });
+            });
+
+            // Обработчики фильтров
+            filterBtns.forEach(btn => {
+                btn.addEventListener('click', () => {
+                    filterBtns.forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+                    currentFilter = btn.getAttribute('data-filter');
+                    updateDisplay();
+                });
+            });
+
+            // Переключение темы
+            const themeBtn = document.getElementById('theme-btn');
+            const htmlElement = document.documentElement;
+            const themeIcon = document.getElementById('theme-icon');
+
+            themeBtn.addEventListener('click', () => {
+                const isLight = htmlElement.getAttribute('data-theme') === 'light';
+                const newTheme = isLight ? 'dark' : 'light';
+                
+                htmlElement.setAttribute('data-theme', newTheme);
+                themeIcon.innerHTML = isLight ? '<use href="#icon-sun"></use>' : '<use href="#icon-moon"></use>';
+            });
+        });
+    </script>
+</body>
+</html>
